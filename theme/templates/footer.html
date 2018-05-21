@@ -1,0 +1,15 @@
+<footer>
+    <div class="about-wrap">
+        <section class="about">
+            <img class="about-avatar" src="{{ SITEURL }}/theme/images/avatar.jpg" border="0" alt="[name]" />
+            <div class="about-body">
+                <p class="about-body-title">About</p>
+                <p class="about-body-description">{{ SITEDESCRIPTION | markdownify }}</p>
+                <ul>
+                    <li><a href="https://www.linkedin.com/in/{{ LINKEDIN_USERNAME }}" target="_blank" class="about-body-link" link="my-linkedin-profile"><img src="{{ SITEURL }}/theme/images/linkedin-128.png" border="0" alt="LinkedIn" /> My LinkedIn</a></li>
+                    <li><a href="https://github.com/{{ GITHUB_USERNAME }}" target="_blank" class="about-body-link" link="my-github-profile"><img src="{{ SITEURL }}/theme/images/github-128.png" border="0" alt="Github" /> My GitHub</a></li>
+                </ul>
+            </div>
+        </section>
+    </div>
+</footer>

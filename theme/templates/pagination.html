@@ -1,0 +1,50 @@
+<ul class="pagination">
+    {% if articles_page.has_previous() %}
+        <li class="pagination-item">
+            <a href="{{ SITEURL }}/{{ articles_previous_page.url }}">&larr; Prev</a>
+        </li>
+    {% endif %}
+
+    {% set page_start = articles_page.number - PAGINATION_WINDOW %}
+    {% set page_end = articles_page.number + PAGINATION_WINDOW %}
+
+    {% if page_start > 1 %}
+        <li class="pagination-item">
+            <a class="pagination-link" href="{{ SITEURL }}/index.html">1</a>
+        </li>
+        <li class="pagination-item">
+            <span class="pagination-link pagination-link--non-numeric">...</span>
+        </li>
+    {% endif %}
+
+    {% for page in range(page_start, page_end) %}
+        {% if page == articles_page.number %}
+            <li class="pagination-item">
+                <a class="pagination-link pagination-link--selected" href="#">{{ page }}</a>
+            </li>
+        {% elif page == 1 %}
+            <li class="pagination-item">
+                <a class="pagination-link" href="{{ SITEURL }}/index.html">{{ page }}</a>
+            </li>
+        {% elif page > 1 and page <= articles_paginator.num_pages %}
+            <li class="pagination-item">
+                <a class="pagination-link" href="{{ SITEURL }}/index{{ page }}.html">{{ page }}</a>
+            </li>
+        {% endif %}
+    {% endfor %}
+
+    {% if articles_paginator.num_pages > page_end %}
+        <li class="pagination-item">
+            <span class="pagination-link pagination-link--non-numeric">...</span>
+        </li>
+        <li class="pagination-item">
+            <a class="pagination-link" href="{{ SITEURL }}/index{{ articles_paginator.num_pages }}.html">{{ articles_paginator.num_pages }}</a>
+        </li>
+    {% endif %}
+
+    {% if articles_page.has_next() %}
+        <li class="pagination-item">
+            <a href="{{ SITEURL }}/{{ articles_next_page.url }}">Next &rarr;</a>
+        </li>
+    {% endif %}
+</ul>

@@ -1,0 +1,24 @@
+<section class="post">
+    <div class="post-header post-header--dw">
+        <a href="{{ article.url }}"><h3 class="post-header-title">{{ article.title }}</h3></a>
+        <h4 class="post-header-date"><span class="ordinal">{{ article.date | date_format }}</span></h4>
+    </div>
+    <div class="post-body">
+        {{ article.content }}
+    </div>
+    <div class="post-footer">
+        <ul class="post-footer-tags">
+            {% for tag in article.tags %}
+              <li class="post-footer-tag">#{{ tag | escape }}</li>
+            {% endfor %}
+        </ul>
+        <br>
+        <div class="social-share">
+            <a class="social-share-element" social-network="linkedin" social-action="share" social-target="{{ article.url }}" href="http://www.linkedin.com/shareArticle?mini=true&title={{ article.title }}&url={{ SITEURL }}/{{ article.url }}&source={{ SITEURL }}" target="_blank" title="Share this post on LinkedIn"></a>
+            &nbsp;
+            <a class="social-share-element" social-network="facebook" social-action="share" social-target="{{ article.url }}" href="https://www.facebook.com/sharer/sharer.php?t={{ article.title }}&u={{ SITEURL }}/{{ article.url }}" target="_blank" title="Share this post on Facebook"></a>
+            &nbsp;
+            <a class="social-share-element" social-network="twitter" social-action="tweet" social-target="{{ article.url }}" href="https://twitter.com/intent/tweet?text={{ article.title }}&url={{ SITEURL }}/{{ article.url }}&hashtags={{ article.tags | map('escape') | join(',') }}" target="_blank" title="Share this post on Twitter"></a>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="{{ DEFAULT_LANG }}">
+<head>
+    {% block head %}
+    <title>{% block title %}{{ SITENAME }}{% endblock title %}</title>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="{{ SITEURL }}/theme/images/icon-page-favicon.ico">
+    {% assets filters="sass", output="css/style.css", "css/style.scss" %}
+    <link rel="stylesheet" href="{{ SITEURL }}/{{ ASSET_URL }}">
+    {% endassets %}
+    <meta name="description" content="{{ SITEDESCRIPTION }}">
+    {% if FEED_ATOM %}
+    <link href="{{ FEED_DOMAIN }}/{%if FEED_ATOM_URL %}{{ FEED_ATOM_URL }}{% else %}{{ FEED_ATOM }}{% endif %}" type="application/atom+xml" rel="alternate" title="{{ SITENAME }} Atom Feed" />
+    {% endif %}
+    {% if FEED_RSS %}
+    <link href="{{ FEED_DOMAIN }}/{% if FEED_RSS_URL %}{{ FEED_RSS_URL }}{% else %}{{ FEED_RSS }}{% endif %}" type="application/rss+xml" rel="alternate" title="{{ SITENAME }} RSS Feed" />
+    {% endif %}
+    {% endblock head %}
+</head>
+<body id="index" class="home">
+    <div id="ribbon"></div>
+    <div id="wrap">
+        {% include 'header.html' %}
+        {% block content %}
+        {% endblock %}
+    </div>
+    {% include 'footer.html' %}
+</body>
+</html>
