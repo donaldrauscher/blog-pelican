@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 
 {% block head %}
-  {{ super() }}
-  {% for tag in article.tags %}
-    <meta name="tags" content="{{tag}}" />
-  {% endfor %}
+    {{ super() }}
+    {% for tag in article.tags %}
+        <meta name="tags" content="{{tag}}" />
+    {% endfor %}
+    {% for resource in article.resources | ensure_metadata_list %}
+        {% include resource ~ '.html' %}
+    {% endfor %}
 {% endblock %}
 
 {% block content %}

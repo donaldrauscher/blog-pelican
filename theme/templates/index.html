@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 
+{% block head %}
+    {{ super() }}
+    {% for resource in RESOURCES %}
+        {% set ns = namespace(add_resource=false) %}
+        {% for article in articles_page.object_list %}
+            {% if resource in article.resources %}
+                {% set ns.add_resource = true %}
+                {% break %}
+            {% endif %}
+        {% endfor %}
+        {% if ns.add_resource %}
+            {% include resource ~ '.html' %}
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
 {% block content %}
 {% for article in articles_page.object_list %}
     {% include 'post.html' %}

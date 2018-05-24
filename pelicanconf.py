@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 from markdown import Markdown
+from pelican.readers import ensure_metadata_list
 
 AUTHOR = 'Donald Rauscher'
 SITEURL = 'http://donaldrauscher.com'
@@ -32,9 +33,16 @@ PLUGINS = ['assets']
 RELATIVE_URLS = True
 DELETE_OUTPUT_DIRECTORY = True
 
+RESOURCES = ['katex', 'plotly', 'jquery']
+
 markdown = Markdown(extensions=['markdown.extensions.extra'])
 
 JINJA_FILTERS = {
     'markdownify': lambda x: markdown.convert(x),
-    'date_format': lambda x: x.strftime('%d %B &#8217;%y')
+    'date_format': lambda x: x.strftime('%d %B &#8217;%y'),
+    'ensure_metadata_list': ensure_metadata_list
+}
+
+JINJA_ENVIRONMENT = {
+    'extensions': ['jinja2.ext.loopcontrols']
 }
