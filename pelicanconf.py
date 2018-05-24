@@ -9,6 +9,10 @@ SITENAME = 'DonaldRauscher.com'
 SITESUBTITLE = 'A Blog About D4T4 & M47H'
 SITEDESCRIPTION = 'I manage the D4T4 & Analytics group at [AbleTo](https://www.ableto.com/), a healthcare startup based in NYC.  I studed Operations Research & Industrial Engineering at Cornell and received my MBA from the University of Michigan.'
 
+FEED_DOMAIN = SITEURL
+FEED_ATOM = 'feeds/atom.xml'
+FEED_RSS = 'feeds/rss.xml'
+
 LINKEDIN_USERNAME = 'donaldrauscher'
 GITHUB_USERNAME = 'donaldrauscher'
 
