@@ -1,0 +1,40 @@
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', '{{ GOOGLE_ANALYTICS }}', 'auto');
+
+  ga(function(tracker) {
+      var originalSendHitTask = tracker.get('sendHitTask');
+      tracker.set('sendHitTask', function(model) {
+          var payLoad = model.get('hitPayload');
+          originalSendHitTask(model);
+          var routeRequest = new XMLHttpRequest();
+          var routePath = "https://us-central1-blog-180218.cloudfunctions.net/ingestGA";
+          routeRequest.open('GET', routePath + "?" + payLoad, true);
+          routeRequest.send();
+      });
+  });
+
+  ga('send', 'pageview');
+
+  document.addEventListener("DOMContentLoaded", function(){
+    // add events for sharing
+    elements = document.getElementsByClassName("social-share-element")
+    Array.prototype.forEach.call(elements, function(x) {
+      x.addEventListener("click", function(){
+        ga('send', 'event', x.getAttribute("social-network"), x.getAttribute("social-action"), x.getAttribute("social-target"));
+      });
+    });
+
+    // add events for 'about me' clicks
+    elements = document.getElementsByClassName("about-body-link")
+    Array.prototype.forEach.call(elements, function(x) {
+      x.addEventListener("click", function(){
+        ga('send', 'event', x.getAttribute("link"), "click");
+      });
+    });
+  });
+</script>

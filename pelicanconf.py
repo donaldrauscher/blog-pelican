@@ -17,6 +17,8 @@ FEED_RSS = 'feeds/rss.xml'
 LINKEDIN_USERNAME = 'donaldrauscher'
 GITHUB_USERNAME = 'donaldrauscher'
 
+GOOGLE_ANALYTICS = 'UA-89570331-1'
+
 TIMEZONE = 'America/Chicago'
 DEFAULT_LANG = 'en'
 
