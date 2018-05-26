@@ -1,0 +1,8 @@
+content/**
+theme/**
+plugins/**
+venv/**
+output/**
+.idea/**
+.git/**
+*.pid
