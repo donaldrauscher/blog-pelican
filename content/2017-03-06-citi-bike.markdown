@@ -1,0 +1,103 @@
+Title: Analyzing Citi Bike Data w/ BigQuery
+Date: 2017-03-06
+Tags: citibike, gcp, bigquery
+Slug: citi-bike
+
+I've recently started using Google Cloud Platform for some of my big data analyses.  In particular, I have been playing with BigQuery.  Unlike AWS Redshift, BigQuery is a fully elastic, multi-tenant database.  It is very easy to setup and gives you essentially infinite scale!  I decided to take BigQuery for a spin with an analysis that I've always been interested in doing: *understanding how Citi Bike re-balances its inventory*.
+
+I started by [downloading](https://s3.amazonaws.com/tripdata/index.html) one year's worth of Citi Bike trips, about 14M trips and 2.4GB.  The [Google SDK](https://cloud.google.com/sdk/docs/) is a great command-line resource that you can use to interact with resources on GCP.  Using the Google SDK, I uploaded this data to a new Google Storage bucket (gsutil), then loaded it into a new schema in BigQuery (bq).  From there, I wrote a few queries to determine station-level inflows/outputs and re-balancing between stations, then dumped these newly created tables back into Google Storage.  Here is the entire workflow:
+
+``` bash
+# download / extract data
+for i in $(seq -f "%02g" 1 12)
+  do
+    echo "Downloading 2016-$i trips"
+    wget --directory-prefix=data 2016$i-citibike-tripdata.zip https://s3.amazonaws.com/tripdata/2016$i-citibike-tripdata.zip
+    echo "Unzipping 2016-$i trips"
+    unzip ./data/2016$i-citibike-tripdata.zip -d data
+  done
+
+# upload to storage
+gsutil mb gs://citi-bike-trips
+gsutil -o GSUtil:parallel_composite_upload_threshold=50M -m cp ./data/*.csv gs://citi-bike-trips
+
+# put into bigquery
+bq mk trips
+read -d '' schema <<- EOF
+  tripduration:integer,
+  starttime:string,
+  stoptime:string,
+  start_station_id:integer,
+  start_station_name:string,
+  start_station_latitude:float,
+  start_station_longitude:float,
+  end_station_id:integer,
+  end_station_name:string,
+  end_station_latitude:float,
+  end_station_longitude:float,
+  bikeid:integer,
+  usertype:string,
+  birth_year:integer,
+  gender:integer
+EOF
+schema=`echo $schema | tr -d '[[:space:]]'`
+bq load --skip_leading_rows=1 trips.trips gs://citi-bike-trips/*.csv $schema
+
+# format start time to timestamp (tricky because multiple formats)
+bq query --use_legacy_sql=false --destination_table=trips.trips2 "
+  SELECT *, TIMESTAMP(PARSE_DATETIME('%m/%d/%Y %H:%M:%S', starttime)) AS starttime_ts
+  FROM trips.trips
+  WHERE REGEXP_CONTAINS(starttime, r'^[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}')
+  UNION ALL
+  SELECT *, TIMESTAMP(starttime) AS starttime_ts
+  FROM trips.trips
+  WHERE NOT REGEXP_CONTAINS(starttime, r'^[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}')"
+
+# pull station-to-station rebalances
+bq query --use_legacy_sql=false --destination_table=trips.rebalances "
+  SELECT last_end_station_id AS from_station, start_station_id AS to_station, COUNT(*) AS n FROM (
+    SELECT bikeid, start_station_id, end_station_id, starttime_ts,
+      LAG(end_station_id, 1) OVER (PARTITION BY bikeid ORDER BY starttime_ts ASC) last_end_station_id
+    FROM trips.trips2
+    ORDER BY bikeid, starttime_ts ASC
+  ) AS x
+  WHERE start_station_id != last_end_station_id
+  GROUP BY 1,2
+  ORDER BY n DESC"
+
+# pull list of stations with inflows and outflows
+bq query --use_legacy_sql=false --destination_table=trips.stations "
+  SELECT id, name, lat, lon, SUM(outflow) AS outflow, SUM(inflow) AS inflow
+  FROM (
+    SELECT id,
+      FIRST_VALUE(name) OVER (PARTITION BY id ORDER BY starttime_ts DESC) AS name,
+      FIRST_VALUE(lat) OVER (PARTITION BY id ORDER BY starttime_ts DESC) AS lat,
+      FIRST_VALUE(lon) OVER (PARTITION BY id ORDER BY starttime_ts DESC) AS lon,
+      outflow, inflow
+    FROM (
+      SELECT start_station_id AS id, start_station_name AS name, start_station_latitude AS lat, start_station_longitude AS lon,
+        COUNT(*) AS outflow, 0 AS inflow, MAX(starttime_ts) AS starttime_ts
+      FROM trips.trips2 GROUP BY 1,2,3,4
+      UNION DISTINCT
+      SELECT end_station_id AS id, end_station_name AS name, end_station_latitude AS lat, end_station_longitude AS lon,
+        0 AS outflow, COUNT(*) AS inflow, MAX(starttime_ts) AS starttime_ts
+      FROM trips.trips2 GROUP BY 1,2,3,4
+    ) AS x
+  ) AS x
+  GROUP BY 1,2,3,4"
+
+# download two new tables
+bq extract trips.rebalances gs://citi-bike-trips/outputs/rebalances.csv
+bq extract trips.stations gs://citi-bike-trips/outputs/stations.csv
+gsutil cp gs://citi-bike-trips/outputs/*.csv ./data/outputs/
+```
+
+Once downloaded, I used R to create some visualizations.  Specifically, the ggmap package, which you can use to download static maps from the Google Maps API and plot data a-la-ggplot2 on top of them.  Here's a plot showing which stations are net inflows vs. net outflows for bikes:
+<img src="/images/citi-bike-stations.png" style="display:block; margin-left:auto; margin-right:auto; width:100%;">
+
+And here's another plot showing the top 100 station-to-station rebalances:
+<img src="/images/citi-bike-rebalances.png" style="display:block; margin-left:auto; margin-right:auto; width:100%;">
+
+Downtown neighborhoods (e.g. East/West Village) tend to be net inflows, presumably because they are frequent leisure destinations for New Yorkers.  Uptown neighborhoods (e.g. Upper East/West Side) tend to be net outflows, presumably because they are more residential.  Midtown is a mixed bag.  On one hand, it has major transit hubs like Penn Station, Port Authority, and Grand Central which are obviously big net outflows.  However, Midtown is also a major commercial center, so I imagine a lot of people commute to work via Citi Bike.
+
+Overall, I found BigQuery very easy to use and *very* fast!  All of my queries ran in under 10 seconds. Previously, BigQuery only supported a non-standard, BigQuery-specific SQL dialect.  However, it now supports [standard SQL](https://cloud.google.com/bigquery/docs/reference/standard-sql/enabling-standard-sql), including uber-useful [analytic/window functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators#analytic-functions).  And best of all, it's very affordable. This dataset costs ~$0.11 per month to host ([$0.026/GB/month](https://cloud.google.com/storage/pricing) on Google Storage and [$0.02/GB/month](https://cloud.google.com/bigquery/pricing#storage) on BigQuery).  Unlike AWS, you don't have to set up an instance and pay for uptime; you pay based on how many bytes you process with your queries ([$5/TB](https://cloud.google.com/bigquery/pricing#on_demand_pricing)) making it very convenient for adhoc/exploratory analytics.  If we assume each of the above 3 queries scanned my entire 2.4GB dataset, this would cost 3\*2.4/1024\*$5 ~ $0.04.  Except the first TB processed each month is free!  Plus Google gives you a $300 credit when you sign up.  All of my code is posted on my [GitHub](https://github.com/donaldrauscher/citi-bike).  Enjoy!

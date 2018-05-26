@@ -2,7 +2,11 @@
 
 from __future__ import unicode_literals
 from markdown import Markdown
+from markdown.extensions import Extension
+from markdown.preprocessors import Preprocessor
 from pelican.readers import ensure_metadata_list
+from jsmin import jsmin
+import re
 
 AUTHOR = 'Donald Rauscher'
 SITEURL = 'http://donaldrauscher.com'
@@ -24,7 +28,7 @@ DEFAULT_LANG = 'en'
 
 PATH = 'content'
 THEME = 'theme'
-STATIC_PATHS = ['images']
+STATIC_PATHS = ['images', 'data']
 
 DEFAULT_PAGINATION = 3
 PAGINATION_WINDOW = 4
@@ -47,4 +51,32 @@ JINJA_FILTERS = {
 
 JINJA_ENVIRONMENT = {
     'extensions': ['jinja2.ext.loopcontrols']
+}
+
+# minifies inline JS so markdown doesn't break it
+class ScriptPreprocessor(Preprocessor):
+
+    @staticmethod
+    def minify(x):
+        return "<script>{}</script>".format(jsmin(x.group(1)))
+
+    def run(self, lines):
+        text = "\n".join(lines)
+        text2 = re.sub("<script>(.*?)<\/script>", self.minify, text, flags=re.DOTALL)
+        return text2.split("\n")
+
+
+class ScriptExtension(Extension):
+    def extendMarkdown(self, md, md_globals):
+        md.preprocessors.add('script', ScriptPreprocessor(md), "<normalize_whitespace")
+
+
+MARKDOWN = {
+    'extensions': [ScriptExtension()],
+    'extension_configs': {
+        'markdown.extensions.codehilite': {'css_class': 'highlight'},
+        'markdown.extensions.extra': {},
+        'markdown.extensions.meta': {}
+    },
+    'output_format': 'html5',
 }

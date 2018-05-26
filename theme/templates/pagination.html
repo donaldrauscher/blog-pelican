@@ -17,7 +17,7 @@
         </li>
     {% endif %}
 
-    {% for page in range(page_start, page_end) %}
+    {% for page in range(page_start, page_end+1) %}
         {% if page == articles_page.number %}
             <li class="pagination-item">
                 <a class="pagination-link pagination-link--selected" href="#">{{ page }}</a>
