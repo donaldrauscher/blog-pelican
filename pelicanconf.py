@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
 from __future__ import unicode_literals
-from markdown import Markdown
-from markdown.extensions import Extension
-from markdown.preprocessors import Preprocessor
+from markdown import markdown
 from pelican.readers import ensure_metadata_list
-from jsmin import jsmin
-import re
+
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
+
+from extensions import ScriptExtension
 
 AUTHOR = 'Donald Rauscher'
 SITEURL = 'http://donaldrauscher.com'
@@ -34,17 +36,15 @@ DEFAULT_PAGINATION = 3
 PAGINATION_WINDOW = 4
 
 PLUGIN_PATHS = ['plugins']
-PLUGINS = ['assets']
+PLUGINS = ['assets', 'load_csv']
 
 RELATIVE_URLS = True
 DELETE_OUTPUT_DIRECTORY = True
 
 RESOURCES = ['katex', 'plotly', 'jquery']
 
-markdown = Markdown(extensions=['markdown.extensions.extra'])
-
 JINJA_FILTERS = {
-    'markdownify': lambda x: markdown.convert(x),
+    'markdownify': lambda x: markdown(x, extensions=['markdown.extensions.extra']),
     'date_format': lambda x: x.strftime('%d %B &#8217;%y'),
     'ensure_metadata_list': ensure_metadata_list
 }
@@ -52,24 +52,6 @@ JINJA_FILTERS = {
 JINJA_ENVIRONMENT = {
     'extensions': ['jinja2.ext.loopcontrols']
 }
-
-# minifies inline JS so markdown doesn't break it
-class ScriptPreprocessor(Preprocessor):
-
-    @staticmethod
-    def minify(x):
-        return "<script>{}</script>".format(jsmin(x.group(1)))
-
-    def run(self, lines):
-        text = "\n".join(lines)
-        text2 = re.sub("<script>(.*?)<\/script>", self.minify, text, flags=re.DOTALL)
-        return text2.split("\n")
-
-
-class ScriptExtension(Extension):
-    def extendMarkdown(self, md, md_globals):
-        md.preprocessors.add('script', ScriptPreprocessor(md), "<normalize_whitespace")
-
 
 MARKDOWN = {
     'extensions': [ScriptExtension()],
