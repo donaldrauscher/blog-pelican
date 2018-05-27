@@ -12,6 +12,9 @@
         <li class="pagination-item">
             <a class="pagination-link" href="{{ SITEURL }}/index.html">1</a>
         </li>
+    {% endif %}
+
+    {% if page_start > 2 %}
         <li class="pagination-item">
             <span class="pagination-link pagination-link--non-numeric">...</span>
         </li>
@@ -33,10 +36,13 @@
         {% endif %}
     {% endfor %}
 
-    {% if articles_paginator.num_pages > page_end %}
+    {% if articles_paginator.num_pages > (page_end+1) %}
         <li class="pagination-item">
             <span class="pagination-link pagination-link--non-numeric">...</span>
         </li>
+    {% endif %}
+
+    {% if articles_paginator.num_pages > page_end %}
         <li class="pagination-item">
             <a class="pagination-link" href="{{ SITEURL }}/index{{ articles_paginator.num_pages }}.html">{{ articles_paginator.num_pages }}</a>
         </li>
