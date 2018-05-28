@@ -9,11 +9,11 @@ class ScriptPreprocessor(Preprocessor):
 
     @staticmethod
     def minify(x):
-        return "<script>{}</script>".format(jsmin(x.group(1)))
+        return "<script{}>{}</script>".format(x.group(1), jsmin(x.group(2)))
 
     def run(self, lines):
         text = "\n".join(lines)
-        text2 = re.sub("<script>(.*?)<\/script>", self.minify, text, flags=re.DOTALL)
+        text2 = re.sub("<script(.*?)>(.*?)<\/script>", self.minify, text, flags=re.DOTALL)
         return text2.split("\n")
 
 

@@ -28,9 +28,7 @@ N <- solve(diag(100) - Q)
 t <- N %*% matrix(1, nrow=100, ncol=1)
 mean(t)+1
 ```
-```
-[1] 2.731999
-```
+<pre>[1] 2.731999</pre>
 
 Though this gets us to the answer, it's tough to extend this approach to the general N case.  Let <span class="inline-equation" data-expr="E_{i}"></span> represent the expected number of rolls until the game ends given that the previous roll was <span class="inline-equation" data-expr="i"></span>. We can develop some recurrence relations starting with <span class="inline-equation" data-expr="E_{100}"></span> and working backwards.  Iterative substitution gives us an expression for <span class="inline-equation" data-expr="E_{i}"></span>:
 <div class="equation" data-expr="\begin{aligned}

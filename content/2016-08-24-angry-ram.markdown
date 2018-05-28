@@ -1,0 +1,26 @@
+Title: 538 Riddler: Escaping the Angry Ram
+Date: 2016-08-24
+Tags: 538, fivethirtyeight, riddler, diffeq
+Slug: angry-ram-riddler
+Resources: katex
+
+Link to [this week's Riddler](http://fivethirtyeight.com/features/can-you-outrun-the-angry-ram-coming-right-for-oh-god/).  I began by forming expressions for two known facts of the problem.   equalities.  Firstly, we know that the derivative of the ram's path will be the slope of the line passing through the ram's current position (x,y) and the location of the fleeing person (1,z). Secondly, by construction, we know that the distance travelled by the ram (which we express with a [line integral](https://en.wikipedia.org/wiki/Arc_length#Finding_arc_lengths_by_integrating)) is some multiple of the distance travelled by the human (z).  These can be expressed as follows:
+<div class="equation" data-expr="Y' = \frac{z-y}{1-x};\quad z=A\int_{0}^{x} \sqrt{1+(Y')^{2}} \,dx \quad where \quad A&lt;1"></div>
+
+Substituting and taking the derivative gives us the following second order differential equation:
+<div class="equation" data-expr="Y'' \left( 1-x \right) = A \sqrt{1 + (Y')^{2}} \quad where \quad Y'(0)=0 \,; Y(0)=0 \,; Y(1)=1"></div>
+
+Since there is no Y term, we can solve this in two steps.  We treat it as a first order differential equation and solve for Y', then integrate the resulting expression to get Y:
+
+A first iteration yields the following expression for <span class="inline-equation" data-expr="Y'"></span>:
+<div class="equation" data-expr="Y' = sinh \left( -A\,log \left( 1 - x \right) + C_{1} \right)"></div>
+<div class="equation" data-expr="Y = \frac{1}{A^{2}-1} \left[ \left( 1-x \right) sinh \left( -A\,log \left( 1 - x \right) \right) + A\, \left( 1-x \right) cosh \left( -A\,log \left( 1-x \right) \right) \right] + C_{2}"></div>
+<div class="equation" data-expr="Y'(0)=0 \rightarrow C_{1}=0 \quad \quad Y(1)=1 \rightarrow C_{2}=1"></div>
+
+Having solved for our two constants, we can use our last condition (that the ram's path passes through the origin) to come up with an expression for <span class="inline-equation" data-expr="A"></span>:
+<div class="equation" data-expr="Y(0)=0 \rightarrow \frac{A}{A^{2}-1} + 1 = 0 \rightarrow A^{2} + A - 1 = 0"></div>
+<div class="equation" data-expr="A = \frac{\sqrt{5}-1}{2} \approx 61.8\%"></div>
+
+<span class="inline-equation" data-expr="A"></span> here represents the % of the ram's distance that the person travels over some period of time.  We want the inverse, how much faster the ram's velocity must be, which is <span class="inline-equation" data-expr="\frac{1}{A}-1"></span> and conveniently also equal to <span class="inline-equation" data-expr="A"></span>. So the ram must travel about 62% faster than the human to reach the human just as he/she reaches the northeast corner of the pen.  This fits into our intuitive bounds for the problem.  At the very least, the ram must travel <span class="inline-equation" data-expr="\sqrt{2}-1=41.4\%"></span> faster to reach the human, if crossing the pen along the diagonal.  Our stupid ram needs to compensate for this stupidity by being 14% faster than the smart ram.
+
+<img src="/images/angry-ram.jpeg" style="display:block; margin-left:auto; margin-right:auto;">
