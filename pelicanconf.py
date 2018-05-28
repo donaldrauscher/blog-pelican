@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(__file__))
 from extensions import ScriptExtension
 
 AUTHOR = 'Donald Rauscher'
-SITEURL = 'http://donaldrauscher.com'
+SITEURL = 'http://www.donaldrauscher.com'
 SITENAME = 'DonaldRauscher.com'
 SITESUBTITLE = 'A Blog About D4T4 & M47H'
 SITEDESCRIPTION = 'I manage the D4T4 & Analytics group at [AbleTo](https://www.ableto.com/), a healthcare startup based in NYC.  I studed Operations Research & Industrial Engineering at Cornell and received my MBA from the University of Michigan.'
