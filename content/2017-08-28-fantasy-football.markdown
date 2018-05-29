@@ -42,6 +42,7 @@ In any case, fantasy football is incredibly fun.  The most important part of cou
 Source: [NumberFire](http://www.numberfire.com/nfl/fantasy/fantasy-football-cheat-sheet/overall#)
 
 So if VBD is so good, then why is our worst fear forgetting about the draft and letting autodraft (which uses a VBD-ordered player list) pick our team?  A few things:
+
 * __There is not consensus on player value__ - There are lots of places to get player projects.  Certain players are really hard to project, like rookies.  In other cases, people may not feel that projections reflect injury risk.
 * __It does not take into account where we are in the draft__ - The descent curve between the best player and the replacement player isn't smooth; it has kinks and plateaus.  Plus, it doesn't often make sense to take whatever person is at the top of the VBD heap.  Do you really want to draft another QB before you have 3 starting WR?
 * __People aren't good at committing to a strategy__ - People get attached to specific players.  They jump the gun to draft players they like even if it isn't the logical choice.

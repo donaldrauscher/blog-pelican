@@ -4,6 +4,7 @@ Tags: etl, pipelining, airflow, gke, gcp
 Slug: airflow-gke
 
 Historically, I have used [Luigi](https://luigi.readthedocs.io/en/latest/) for a lot of my data pipelining.  Recently, however, I have started experimenting with [Airflow](https://airflow.apache.org/) for [a variety of reasons](https://www.quora.com/Which-is-a-better-data-pipeline-scheduling-platform-Airflow-or-Luigi).  Some things I really like about Airflow:
+
 - **Easier to parallize** - Luigi can only be scaled *locally*.  You can create multiple worker threads by passing `--workers N` when kicking off a job, but you cannot parallelize Luigi jobs across multiple machines!  Airflow parallelizes quite well.  For instance, you can use [Celery](https://airflow.apache.org/configuration.html#scaling-out-with-celery) to scale out your workers.
 - **Superior scheduler** - The Luigi "central scheduler" is a bit of a misnomer; it doesn't actually schedule anything!  Its main purpose is to prevent worker threads from running the same task concurrently. That's it. You still need to initiate Luigi jobs with a cronjob.  The Airflow scheduler is *much* more useful. You can use it to set up a cronjob-like schedule for a DAG and even initiate retries following errors.  
 - **Connection management** - Airflow has a nice mechanism for organizing [connections](https://airflow.apache.org/concepts.html#connections) to your resources.  This is really useful, especially in a multiuser environment.  It allows you to avoid storing secrets in .gitignore'd config files all over the place.
