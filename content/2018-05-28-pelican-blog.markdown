@@ -41,21 +41,12 @@ ENV PATH /builder/dart-sass:${PATH}
 
 COPY requirements.txt .
 
-# requirements.txt
-# blinker==1.4
-# docutils==0.14
-# feedgenerator==1.9
-# Jinja2==2.10
-# jsmin==2.2.2
-# Markdown==2.6.11
-# MarkupSafe==1.0
-# pelican==3.7.1
-# Pygments==2.2.0
-# python-dateutil==2.7.3
-# pytz==2018.4
-# six==1.11.0
-# Unidecode==1.0.22
-# webassets==0.12.1
+# requirements.txt:
+# blinker==1.4        Markdown==2.6.11        pytz==2018.4
+# docutils==0.14      MarkupSafe==1.0         six==1.11.0
+# feedgenerator==1.9  pelican==3.7.1          Unidecode==1.0.22
+# Jinja2==2.10        Pygments==2.2.0         webassets==0.12.1
+# jsmin==2.2.2        python-dateutil==2.7.3
 
 RUN pip install --no-cache-dir --upgrade setuptools \
   && pip install --no-cache-dir --upgrade -r requirements.txt
