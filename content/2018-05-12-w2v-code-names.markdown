@@ -110,26 +110,23 @@ Dash app (app.py)
 Dockerfile
 
     :::docker
-    FROM continuumio/miniconda3:4.4.10
+    FROM python:3.5-slim
     
     ENV PORT 8050
-    ENV CONDA_ENV code-names
-    ENV GLOVE_MODEL glove.6B.100d
+    ENV GLOVE_MODEL glove.6B.200d
     ENV GUNICORN_WORKERS 3
     ENV APP_DIR /app
     
     WORKDIR $APP_DIR
     
     RUN apt-get update \
-      && apt-get install -y unzip gzip \
+      && apt-get install -y unzip gzip wget \
       && rm -rf /var/lib/apt/lists/*
     
     COPY requirements.txt app.py entrypoint.sh ./
     RUN chmod +x entrypoint.sh
     
-    RUN conda create -n ${CONDA_ENV} \
-      && export PATH=/opt/conda/envs/$CONDA_ENV/bin:$PATH \
-      && while read req; do pip install --no-cache-dir --upgrade $req; done < requirements.txt
+    RUN pip install -r requirements.txt
     
     RUN wget -q http://nlp.stanford.edu/data/glove.6B.zip \
       && unzip glove.6B.zip -d glove \
@@ -154,7 +151,8 @@ entrypoint.sh
         --preload \
         --worker-class gevent \
         --timeout 600 \
-        --log-level info
+        --log-level info \
+        "$@"
 
 Example output:
 <img src="{filename}images/code-names.png" width="885px" style="display:block; margin-left:auto; margin-right:auto;">
