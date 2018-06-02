@@ -159,4 +159,4 @@ Example output:
 
 Overall, it does...okay haha.  In some cases, it does surprisingly well.  For instance, the app provides "published" as a top hint for "book" and "penguin".  However, the algorithm struggles to identify commonalities that may not be explicitly collocated in text.  For instance, for "dog" and "whale", "mammal" might be a good hint.  However, our app simply lists other animals, e.g. "cat" and "shark".
 
-I'm hosting a version of the app [here](https://code-names-ypzseaxpnx.now.sh/) on Now.sh.  And a [link](https://github.com/donaldrauscher/code-names) to my repo on GH.  Cheers!
+I'm hosting a version of the app [here](https://code-names-hnlpvnlkir.now.sh/) on Now.sh.  And a [link](https://github.com/donaldrauscher/code-names) to my repo on GH.  Cheers!
