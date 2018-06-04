@@ -32,7 +32,7 @@ Dash app (app.py)
     server = app.server
     
     # load model
-    model = 'glove/w2v.{}.txt.gz'.format(os.getenv('GLOVE_MODEL', 'glove.6B.100d'))
+    model = 'glove/w2v.{}.txt.gz'.format(os.getenv('GLOVE_MODEL', 'glove.6B.50d'))
     word_vectors = KeyedVectors.load_word2vec_format(model, binary=False)
     
     # precompute L2-normalized vectors (saves lots of memory)
@@ -127,6 +127,12 @@ Dockerfile
     RUN chmod +x entrypoint.sh
     
     RUN pip install -r requirements.txt
+    
+    # requirements.txt:
+    # dash==0.21.1                    gensim==3.4.0
+    # dash-core-components==0.22.1    pandas==0.22.0
+    # dash-html-components==0.10.1    gunicorn==19.8.1
+    # dash-renderer==0.12.1           gevent==1.2.2
     
     RUN wget -q http://nlp.stanford.edu/data/glove.6B.zip \
       && unzip glove.6B.zip -d glove \
