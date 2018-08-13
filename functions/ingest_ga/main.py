@@ -2,6 +2,7 @@
 # streams google analytics data into bigquery
 def ingest_ga(request):
     import datetime
+    import flask
     from google.cloud import bigquery
 
     mapping = {
@@ -28,4 +29,9 @@ def ingest_ga(request):
     errors = client.insert_rows(table, [row])
     if len(errors) > 0:
         raise RuntimeError(errors[0]['errors'])
+
+    resp = flask.make_response()
+    resp.headers.add('Access-Control-Allow-Origin', '*')
+
+    return resp
 
