@@ -4,6 +4,7 @@ steps:
   - name: gcr.io/${PROJECT_ID}/pelican:latest
     args: ["content", "-v"]
     dir: blog-pelican
+    env: ['ENV=${_ENV}']
   - name: gcr.io/cloud-builders/gcloud
     entrypoint: gsutil
     args: ["-m", "rsync", "-r", "-c", "-d", "./output", "gs://${_SUB_DOMAIN}.donaldrauscher.com"]
@@ -11,3 +12,4 @@ steps:
 substitutions:
   _BRANCH: master
   _SUB_DOMAIN: www
+  _ENV: prod

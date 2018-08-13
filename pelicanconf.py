@@ -10,6 +10,8 @@ sys.path.append(os.path.dirname(__file__))
 
 from extensions import ScriptExtension
 
+ENV = os.getenv('ENV', 'prod')
+
 AUTHOR = 'Donald Rauscher'
 SITEURL = 'http://www.donaldrauscher.com'
 SITENAME = 'DonaldRauscher.com'

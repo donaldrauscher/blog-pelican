@@ -2,6 +2,9 @@
 ##
 # This section should match your Makefile
 ##
+
+export ENV=test
+
 PY=${PY:-python}
 PELICAN=${PELICAN:-pelican}
 PELICANOPTS=

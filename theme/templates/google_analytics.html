@@ -12,7 +12,7 @@
           var payLoad = model.get('hitPayload');
           originalSendHitTask(model);
           var routeRequest = new XMLHttpRequest();
-          var routePath = "https://us-central1-blog-180218.cloudfunctions.net/ingestGA";
+          var routePath = "https://us-central1-blog-180218.cloudfunctions.net/ingest_ga";
           routeRequest.open('GET', routePath + "?" + payLoad, true);
           routeRequest.send();
       });
