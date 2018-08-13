@@ -13,8 +13,7 @@ The following visual illustrates how to solve the N=3 through N=10 cases.  Like 
 <img src="/images/untangled-riddler.jpg" style="display:block; margin-left:auto; margin-right:auto;">
 
 There are a couple tricky cases that are worth noting.  
-<ul>
-<li><span style="font-weight:bold;">N=2:</span> We actually can't figure out the simplest tangle of all!  Well, we can't figure it out when playing by the current rules.  One option would be to connect a new wire to one of the wires at the bottom, run it up to the top, and then use our circuit tester with the two wires; this effectively makes it a N=3 case where one wire is known.</li>
-<li><span style="font-weight:bold;">N=6:</span> By extension, the fact that N=2 is impossible makes the N=6 case tricky.  Though we can still figure it out in 3 trips.  We start by splitting into two halves, one with 4 wires and one with 2 wires.  We then form a circuit between the two halves, which allows us to pinpoint 3 wires.  Finally, we form 3 circuits between the 3 known wires and the 3 unknown wires.</li>
-<li><span style="font-weight:bold;">N=10:</span> This is why we split this into N=6 and N=4 cases rather than N=8 and N=2 cases!</li>
-</ul>
+
++ **N=2**: We actually can't figure out the simplest tangle of all!  Well, we can't figure it out when playing by the current rules.  One option would be to connect a new wire to one of the wires at the bottom, run it up to the top, and then use our circuit tester with the two wires; this effectively makes it a N=3 case where one wire is known.
++ **N=6**: By extension, the fact that N=2 is impossible makes the N=6 case tricky.  Though we can still figure it out in 3 trips.  We start by splitting into two halves, one with 4 wires and one with 2 wires.  We then form a circuit between the two halves, which allows us to pinpoint 3 wires.  Finally, we form 3 circuits between the 3 known wires and the 3 unknown wires.
++ **N=10**: This is why we split this into N=6 and N=4 cases rather than N=8 and N=2 cases!

@@ -8,6 +8,7 @@ The other day I was building a model and wanted to layer in some ZIP-level censu
 In either case, I stumbled upon a [post](https://blog.splitwise.com/2013/09/18/the-2010-us-census-population-by-zip-code-totally-free/) from the data folks at Splitwise (if you're not already a user, I highly recommend) which cued me into the US Census API(s).  An API!  It is not the most elegant or well-documented but is still very useful once you get the hang of it.  Each data source (e.g. 2010 Dicentennial Census) has its own API endpoint, and each endpoint has a list of geographies that you can pull data at and a list of variables that can be pulled.
 
 A few useful notes:
+
 + You can apply for an API key [here](http://api.census.gov/data/key_signup.html)
 + Here's a [link](https://api.census.gov/data.html) to all the APIs available and their respective documentation
 + In some cases, you can't pull data at the level you want in a single API call.  For instance, for the [2010 Dicentennial Census](https://api.census.gov/data/2010/sf1/geography.html) data, you must specify a state when requesting ZIP-level data.  So you need to download a list of states, then loop through the states and download ZIP-level information for each one  (adding `&in=state:XX` into each call).  Example [here](https://github.com/donaldrauscher/census-api/blob/master/population.py).  For other APIs like the [American Community Survey](https://api.census.gov/data/2015/acs5/geography.html) data, this isn't necessary.

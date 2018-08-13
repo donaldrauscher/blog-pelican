@@ -68,7 +68,7 @@ gcloud container images list-tags gcr.io/${PROJECT_ID}/shiny-farkle
 
 Finally, we're going to deploy this image on Google Kubernetes Engine.  I used [Terraform](https://www.terraform.io/) to define and create the GCP infrastructure components for this project: a Kubernetes clusters and a global static IP.  Finally, we apply a Kubernetes manifest containing a deployment for our image and a service, connected to the static IP, to make the service externally accessible.  I packaged my Kubernetes resources in [a Helm chart](https://helm.sh/), which you can use to inject values / variables via template directives (e.g. \{\{ ... \}\}).
 
-``` terraform
+``` bash
 terraform apply -var project=${PROJECT_ID}
 
 gcloud container clusters get-credentials shiny-cluster
@@ -79,7 +79,7 @@ helm install . --set projectId=${PROJECT_ID}
 ```
 
 Terraform configuration:
-``` bash
+``` terraform
 variable "project" {}
 
 variable "region" {

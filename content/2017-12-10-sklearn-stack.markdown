@@ -20,11 +20,13 @@ from sklearn.linear_model import LogisticRegression
 
 from scipy.special import logit
 
+
 # method for linking `predict_proba` to `transform`
 def chop_col0(function):
     def wrapper(*args, **kwargs):
         return function(*args, **kwargs)[:,1:]
     return wrapper
+
 
 def add_transform(classifiers):
     for key, classifier in classifiers:
@@ -34,40 +36,51 @@ def add_transform(classifiers):
         classifier.__class__.transform = chop_col0(classifier.__class__.predict_proba)
         # NOTE: need to add to class so `clone` in `cross_val_predict` works
 
+
 # default function applies logit to probabilies and applies logistic regression
 def default_meta_classifier():
     return Pipeline([
-        ('logit', FunctionTransformer(logit)),
+        ('logit', FunctionTransformer(lambda x: logit(np.clip(x, 0.001, 0.999)))),
         ('scaler', StandardScaler()),
         ('lr', LogisticRegression())
     ])
 
+
 # stacking classifier
 class StackingClassifier(Pipeline):
 
-    def __init__(self, classifiers, meta_classifier = None, cv = 3):
+    def __init__(self, classifiers, meta_classifier=None, cv=3):
         add_transform(classifiers)
-        self.classifiers = FeatureUnion(classifiers)
+        self.classifiers = classifiers
         self.meta_classifier = meta_classifier if meta_classifier else default_meta_classifier()
         self.cv = cv
-        self.steps = [('stack', self.classifiers), ('meta', self.meta_classifier)]
+        self.steps = [('stack', FeatureUnion(self.classifiers)), ('meta', self.meta_classifier)]
         self.memory = None
 
+    @staticmethod
+    def add_dict_prefix(x, px):
+        return {'%s__%s' % (px, k) : v for k,v in x.items()}
+
+    def set_params(self, **kwargs):
+        return super(StackingClassifier, self).set_params(**self.add_dict_prefix(kwargs, 'stack'))
+
     def fit(self, X, y):
-        meta_features = cross_val_predict(self.classifiers, X, y, cv = self.cv, method = "transform")
+        meta_features = cross_val_predict(FeatureUnion(self.classifiers), X, y, cv=self.cv, method="transform")
         self.meta_classifier.fit(meta_features, y)
-        self.classifiers.fit(X, y)
+        for name, classifier in self.classifiers:
+            classifier.fit(X, y)
+        return self
 ```
 
 You can see this code implemented [here](https://github.com/donaldrauscher/hospital-readmissions/blob/master/model.py).  I built a model to predict which recently hospitalized diabetic patients will be re-hospitalized within 30 days, using [this dataset](https://archive.ics.uci.edu/ml/datasets/diabetes+130-us+hospitals+for+years+1999-2008) from UCI.  My model stack contained a logistic regression with regularization, a random forest, and a gradient boosting (xgboost) model.  Here is a summary of model performance:
 
 <table class="pretty">
 <tr><th>Model</th><th>AUC</th></tr>
-<tr><td>LR+RF+XGB Model Stack</td><td>0.697296858891</td></tr>
-<tr><td>LR+RF+XGB Average</td><td>0.696381690752</td></tr>
-<tr><td>Random Forest</td><td>0.693003188754</td></tr>
-<tr><td>XGBoost</td><td>0.692441123617</td></tr>
-<tr><td>Logistic Regression</td><td>0.685167372785</td></tr>
+<tr><td>LR+RF+XGB Model Stack</td><td>0.6990824552912449</td></tr>
+<tr><td>LR+RF+XGB Average</td><td>0.6981398497127431</td></tr>
+<tr><td>XGBoost</td><td>0.6956653497449965</td></tr>
+<tr><td>Random Forest</td><td>0.6952079165690574</td></tr>
+<tr><td>Logistic Regression</td><td>0.684611003872049</td></tr>
 </table>
 
 As you can see, a simple average of the models outperforms any one model.  And our model stack outperforms the simple average.

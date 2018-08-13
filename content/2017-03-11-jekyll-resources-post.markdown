@@ -35,7 +35,6 @@ resources: [plotly]
 
 Next, I made another include which adds a resource if it is required. For paginator pages, we need to loop through each post on the page. For specific post pages, we obviously just check that individual page.
 
-{% raw %}
 add_resource.html
 ``` html
 {% assign add_resource = false %}
@@ -54,7 +53,6 @@ add_resource.html
   {% include {{ resource | append:'.html' }} %}
 {% endif %}
 ```
-{% endraw %}
 
 ## 4. Add Logic to Check Each Resource
 
@@ -66,7 +64,6 @@ Finally, I added a little more Liquid logic to the head tag (which is in a head.
 resources: [katex, plotly, jquery, d3]
 ```
 
-{% raw %}
 head.html
 ``` markdown
 <head>
@@ -76,6 +73,5 @@ head.html
   {% endfor %}
 </head>
 ```
-{% endraw %}
 
 And that's it!  You can see this implemented in my Jekyll site [here](https://github.com/donaldrauscher/blog).  Enjoy.

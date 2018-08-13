@@ -8,6 +8,7 @@ Professionally, I have worked quite a lot with BI platforms Looker and Tableau. 
 ## Infrastructure Setup
 
 We will use the following Google Cloud components to set up Redash:
+
 * Postgres DB (via CloudSQL)
 * Persistent disk for Redis instance
 * Kubernetes cluster for Redash Docker image

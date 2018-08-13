@@ -41,6 +41,7 @@ Portfolio Asset Weights:
 All of my code is posted on my [GitHub](https://github.com/donaldrauscher/etf-portfolio).  The universe of ETFs analyzed and their tilts can be downloaded <a href="/data/etf_portfolio/etf_db.csv" target="_blank">here</a> and <a href="/data/etf_portfolio/etf_tilts.csv" target="_blank">here</a>.  Cheers!
 
 <div id="risk_vs_return" style="width: 800; height: 500;"></div>
+
 <script>
 
   Plotly.d3.csv("/data/etf_portfolio/viz1_1.csv", function(data1){
@@ -111,6 +112,7 @@ All of my code is posted on my [GitHub](https://github.com/donaldrauscher/etf-po
 </script>
 
 <div id="cumulative_returns" style="width: 800; height: 500;"></div>
+
 <script>
   Plotly.d3.csv("/data/etf_portfolio/viz2.csv", function(data){
 
@@ -145,6 +147,7 @@ All of my code is posted on my [GitHub](https://github.com/donaldrauscher/etf-po
 </script>
 
 <div id="weights" style="width: 800; height: 350;"></div>
+
 <script>
   Plotly.d3.csv("/data/etf_portfolio/viz3.csv", function(data){
 
@@ -195,6 +198,7 @@ All of my code is posted on my [GitHub](https://github.com/donaldrauscher/etf-po
 </script>
 
 <div id="tilts" style="width: 800; height: 500;"></div>
+
 <script>
   Plotly.d3.csv("/data/etf_portfolio/viz4.csv", function(data){
 

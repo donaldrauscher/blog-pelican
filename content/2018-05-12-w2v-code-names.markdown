@@ -32,7 +32,7 @@ Dash app (app.py)
     server = app.server
     
     # load model
-    model = 'glove/w2v.{}.txt.gz'.format(os.getenv('GLOVE_MODEL', 'glove.6B.100d'))
+    model = 'glove/w2v.{}.txt.gz'.format(os.getenv('GLOVE_MODEL', 'glove.6B.50d'))
     word_vectors = KeyedVectors.load_word2vec_format(model, binary=False)
     
     # precompute L2-normalized vectors (saves lots of memory)
@@ -110,26 +110,29 @@ Dash app (app.py)
 Dockerfile
 
     :::docker
-    FROM continuumio/miniconda3:4.4.10
+    FROM python:3.5-slim
     
     ENV PORT 8050
-    ENV CONDA_ENV code-names
-    ENV GLOVE_MODEL glove.6B.100d
+    ENV GLOVE_MODEL glove.6B.200d
     ENV GUNICORN_WORKERS 3
     ENV APP_DIR /app
     
     WORKDIR $APP_DIR
     
     RUN apt-get update \
-      && apt-get install -y unzip gzip \
+      && apt-get install -y unzip gzip wget \
       && rm -rf /var/lib/apt/lists/*
     
     COPY requirements.txt app.py entrypoint.sh ./
     RUN chmod +x entrypoint.sh
     
-    RUN conda create -n ${CONDA_ENV} \
-      && export PATH=/opt/conda/envs/$CONDA_ENV/bin:$PATH \
-      && while read req; do pip install --no-cache-dir --upgrade $req; done < requirements.txt
+    RUN pip install -r requirements.txt
+    
+    # requirements.txt:
+    # dash==0.21.1                    gensim==3.4.0
+    # dash-core-components==0.22.1    pandas==0.22.0
+    # dash-html-components==0.10.1    gunicorn==19.8.1
+    # dash-renderer==0.12.1           gevent==1.2.2
     
     RUN wget -q http://nlp.stanford.edu/data/glove.6B.zip \
       && unzip glove.6B.zip -d glove \
@@ -154,11 +157,12 @@ entrypoint.sh
         --preload \
         --worker-class gevent \
         --timeout 600 \
-        --log-level info
+        --log-level info \
+        "$@"
 
 Example output:
 <img src="{filename}images/code-names.png" width="885px" style="display:block; margin-left:auto; margin-right:auto;">
 
 Overall, it does...okay haha.  In some cases, it does surprisingly well.  For instance, the app provides "published" as a top hint for "book" and "penguin".  However, the algorithm struggles to identify commonalities that may not be explicitly collocated in text.  For instance, for "dog" and "whale", "mammal" might be a good hint.  However, our app simply lists other animals, e.g. "cat" and "shark".
 
-I'm hosting a version of the app [here](https://code-names-ypzseaxpnx.now.sh/) on Now.sh.  And a [link](https://github.com/donaldrauscher/code-names) to my repo on GH.  Cheers!
+I'm hosting a version of the app [here](https://code-names-hnlpvnlkir.now.sh/) on Now.sh.  And a [link](https://github.com/donaldrauscher/code-names) to my repo on GH.  Cheers!

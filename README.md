@@ -6,11 +6,10 @@ gcloud container builds submit --gcs-source-staging-dir=gs://djr-data/cloudbuild
 
 Building production blog with Google Cloud Container Builder:
 ```bash
-gcloud container builds submit --gcs-source-staging-dir=gs://djr-data/cloudbuild --config cloudbuild.yaml .
+source build.sh cloud prod
 ```
 
-Building test blog locally:
+Building locally and pushing to test bucket:
 ```bash
-pelican content
-gsutil -m rsync -r -c -d ./output gs://test.donaldrauscher.com
+source build.sh local test
 ```

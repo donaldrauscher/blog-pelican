@@ -1,0 +1,134 @@
+Title: Building Pipelines in K8s with Brigade
+Date: 2018-07-14
+Tags: k8s gke brigade pipelines cryptocurrency
+Slug: brigade-crypto
+
+Kubernetes started as a deployment option for stateless services.  However, people are increasingly using Kubernetes clusters to execute complex workflows for CI/CD, ETL, machine learning, etc.  And there are a number of tools/projects that have sprung up to help orchestrate these workflows.  Two that I have been exploring are [Argo](https://applatix.com/open-source/argo/)  (from Applatix) and [Brigade](https://brigade.sh/) (from DEIS, now Microsoft, the same folks who developed the popular K8s package manager [Helm](https://helm.sh/)).
+
+The container is, of course, at the center of both of these frameworks.  Each step in the pipeline is a job that is executed by a Docker container.  The major difference between Argo and Brigade is how they specify pipelines.  In Argo, pipelines are *declared* with YAML.  In Brigade, pipelines are *scripted* with JavaScript.  Co-creator Matt Butcher provides [a great explanation](http://technosophos.com/2018/01/04/why-brigade-doesn-t-do-yaml.html) for why they chose this approach .  I found this idea really interesting, so I chose to take Brigade for a spin.
+
+I built a simple pipeline which loads cryptocurrency prices from [CoinAPI](https://www.coinapi.io/) into Google BigQuery.  I also used [MailGun](https://www.mailgun.com/) to send notifications when pipelines complete/fail.
+
+### 1. Creating Container for Pipeline Steps
+
+Firstly, we need a Docker container that will execute pipeline steps.  In my simple use case, I was able to use a single image, but you could just as easily use a different image for each step.  I used a [Google Cloud Container Builder image](https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/gcloud) as my base image.  This contains `gcloud`, `kubectl`, `gsutil`, and `bq` utilities.  To that, I added a tool called [`jq`](https://stedolan.github.io/jq/), which I used to convert JSON into newline-delimited JSON for the BigQuery import.
+
+```dockerfile
+FROM gcr.io/cloud-builders/gcloud:latest
+
+RUN apt-get update \
+  && apt-get install -y wget \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN wget -O /usr/local/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 \
+  && chmod +x /usr/local/bin/jq
+
+ENTRYPOINT ["bash"]
+```
+
+### 2. Creating Brigade Project
+
+Next, I needed to create a Brigade project.  The Brigade project serves as an execution context for our pipeline.  Brigade projects can be easily created with the [`brigade-project` Helm chart](https://github.com/Azure/brigade/tree/master/charts/brigade-project).  The project contains a link to a Git repo, which should contain a `brigade.js` script for our pipeline.  It also contains secrets that can be referenced throughout our pipeline.
+
+```yaml
+# values.yaml
+project: donald/crypto
+namespace: brigade
+repository: github.com/donaldrauscher/brigade-crypto
+cloneURL: https://github.com/donaldrauscher/brigade-crypto.git
+# secrets.yaml
+secrets:
+  projectId: ...
+  coinAPIKey: ...
+  mailgunAPIKey: ...
+```
+
+```
+helm install brigade/brigade-project -f values.yaml,secrets.yaml --namespace brigade
+```
+
+### 3. Creating the Brigade Pipeline
+
+Now we need to set up a Javascript script which defines our pipeline.  We can pass any script to Brigade at runtime, but this is discouraged; this script should ideally be placed in the Git repo that is referenced in the Brigade project.  Some [good documentation](https://github.com/Azure/brigade/blob/master/docs/topics/scripting.md) on how to write Brigade scripts.
+
+```javascript
+\\brigade.js
+const { events, Job } = require("brigadier")
+
+function makeImg(p) {
+  return "gcr.io/" + p.secrets.projectId + "/brigade-crypto:latest"
+}
+
+function mailgunCmd(e, p) {
+  var key = p.secrets.mailgunAPIKey
+
+  if (e.cause.trigger == 'success'){
+    var msg = "Build " + e.cause.event.buildID + " ran successfully"
+  } else {
+    var msg = e.cause.reason
+  }
+  
+  return `
+    curl -s --user "api:${key}" https://api.mailgun.net/v3/mg.donaldrauscher.com/messages \
+    -F from="mg@donaldrauscher.com" \
+    -F to="donald.rauscher@gmail.com" \
+    -F subject="Brigade Notification" \
+    -F text="${msg}"
+  `
+}
+
+events.on("exec", (e, p) => {
+  var j1 = new Job("j1", makeImg(p))
+
+  j1.storage.enabled = false
+
+  j1.env = {
+    "COIN_API_KEY": p.secrets.coinAPIKey,
+    "TIMESTAMP": e.payload.trim()
+  }
+
+  j1.tasks = [
+    "export TIMESTAMP=${TIMESTAMP:-$(date '+%Y-%m-%dT%H:%M')}",
+    "curl https://rest.coinapi.io/v1/quotes/current?filter_symbol_id=_SPOT_ --request GET --header \"X-CoinAPI-Key: $COIN_API_KEY\" --fail -o quotes.json",
+    "jq --compact-output '.[]' quotes.json > quotes.ndjson",
+    "gsutil cp quotes.ndjson gs://djr-data/crypto/$TIMESTAMP/quotes.ndjson",
+    "bq load --replace --source_format=NEWLINE_DELIMITED_JSON crypto.quotes gs://djr-data/crypto/$TIMESTAMP/quotes.ndjson"
+  ]
+
+  j1.run()
+})
+
+events.on("after", (e, p) => {
+  var a1 = new Job("a1", makeImg(p))
+  var cmd = mailgunCmd(e, p)
+  a1.storage.enabled = false
+  a1.tasks = [cmd]
+  a1.run()
+})
+
+events.on("error", (e, p) => {
+  var e1 = new Job("e1", makeImg(p))
+  var cmd = mailgunCmd(e, p)
+  e1.storage.enabled = false
+  e1.tasks = [cmd]
+  e1.run()
+})
+```
+
+### 4. Testing Pipeline
+
+Finally, we can test our pipeline.  To manually trigger builds and check the status of builds, you will need the `brig` command line tool.  You can [download](https://github.com/Azure/brigade/releases) this from one of the Brigade releases.  
+
+```
+brig run donald/crypto -f brigade.js -n brigade
+export BRIG_PROJECT_ID=$(brig project list -n brigade | grep "donald/crypto" | head -1 | awk '{ print $2 }')
+export BRIG_BUILD_ID=$(brig build list -n brigade | grep "$BRIG_PROJECT_ID" | tail -1 | awk '{ print $1 }')
+brig build logs $BRIG_BUILD_ID -n brigade
+kubectl logs j1-$BRIG_BUILD_ID -n brigade
+```
+
+I also adapted [this example](https://github.com/technosophos/brigade-cron) from Matt Butcher to create a cronjob to kick off this pipeline periodically.  My main revision was to insert the timestamp into the event payload using a K8s init container.
+
+===
+
+Overall, I am really impressed with Brigade.  I'm really excited to use it more   You can find a link to all of my work [here](https://github.com/donaldrauscher/brigade-crypto).  Cheers!

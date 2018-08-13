@@ -9,6 +9,7 @@ I recently completed the [Kaggle Renthop Competition](kaggle.com/c/two-sigma-con
 ### My Kaggle Model
 
 A summary of my final solution:
+
 * My best solution was a model stack with 2 XGB models and 2 GLMNET models.
 * I rather lazily tuned my XGB models by looking at the parameters in high-performing public notebooks: eta=0.02, min_child_weight=3, max_depth=6, colsample_bytree=0.4, subsample=1, gamma=0, nrounds = 2000.  I also implemented early stopping to prevent overfitting.  For GLMNET, I used Lasso (alpha = 1); a safe choice to limit model complexity.  For both models, I used 5-fold cross validation.
 * I blended these models using a simple linear combination, which I tuned on cross-validated, out-of-sample predictions.

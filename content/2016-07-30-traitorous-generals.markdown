@@ -5,10 +5,10 @@ Slug: traitorous-generals
 Resources: katex
 
 We begin by selecting one general at random.  Our goal will be to determine if this specific general is loyal or traitorous, which we can figure out by polling the other generals.  As we go around the circle, there are two stop conditions:
-<ol>
-<li>The selected general receives <span class="inline-equation" data-expr="\left( \lceil N/2 \rceil \right)-1"></span> loyal votes</li>
-<li>The selected general receives <span class="inline-equation" data-expr="\left( \lceil N/2 \rceil \right)"></span> traitorous votes</li>
-</ol>
+
+1. The selected general receives <span class="inline-equation" data-expr="\left( \lceil N/2 \rceil \right)-1"></span> loyal votes
+2. The selected general receives <span class="inline-equation" data-expr="\left( \lceil N/2 \rceil \right)"></span> traitorous votes
+
 If [1] happens, we know the selected general to be loyal.  If [2] happens, we know the selected general to be traitorous.  This works because we know that there is a majority of loyal generals and that all loyal generals are honest.  If, during this inquisition, we identify a loyal general, then we're obviously done.  If we identify a traitorous general, then we incarcerate him (or perhaps a more sinister punishment) and pick a new general to evaluate.  We begin a new inquisition and reduce our stop conditions by 1.  Through this process, we are guaranteed to find a loyal general. How many questions will it take though?
 
 The maximum number of questions it takes to get to one of these two stop conditions is dependent on how the traitors behave.  This requires a little explanation.  Let's say we pick a traitorous general for our first inquisition.  All the other traitors shouldn't try to vouch for him (i.e. claim he is loyal) because (1) it will not save him and (2) it will doom them individually.  We're going to get to the right answer regardless, and anyone who said the traitor was not a traitor will be outed along with him.  If our traitors choose the "band together" route, this whole thing will be over after this inquisition since we'll be able to pinpoint all of the traitors (the selected general and anyone who said he was loyal).  If our traitors are self-preservational, we will confirm that the selected general is a traitor in exactly <span class="inline-equation" data-expr="\lceil N/2 \rceil"></span> questions but will then need to begin another inquisition.

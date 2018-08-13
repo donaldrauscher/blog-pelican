@@ -9,6 +9,7 @@ Does your projected starting quarterback have an [18-42](https://www.pro-footbal
 In any case, fantasy football is incredibly fun.  The most important part of course being the draft.  For quite a long time, the table stakes for draft strategy has been value-based drafting (VBD), pioneered by [Joe Bryant of Footballguys.com in 2001](http://www.footballguys.com/bryantvbd.htm). The core idea behind VBD is that a player’s value isn’t based on how many _absolute_ points he scores, but rather how many points he scores _relative_ to a "baseline" player at his position.  The most common strategy for establishing the baseline is to compare each player to the last starting player at that position (Value Over Last Starter of VOLS).  Let's say we have a 10 person league with standard rules (1 starting QB, 2 starting RB, 3 starting WR, 1 TE, 1 Flex, 1 DEF).   Quarterbacks are compared to the 10th best quarterback, RBs are compared to the 20th best RB, WRs are compared to the 30th best WR, etc.  
 
 <div id="vbd_plot" style="width: 885; height: 400;"></div>
+
 <script>
   Plotly.d3.csv("/data/fantasy_football/plot1.csv", function(data){
 
@@ -42,12 +43,15 @@ In any case, fantasy football is incredibly fun.  The most important part of cou
 Source: [NumberFire](http://www.numberfire.com/nfl/fantasy/fantasy-football-cheat-sheet/overall#)
 
 So if VBD is so good, then why is our worst fear forgetting about the draft and letting autodraft (which uses a VBD-ordered player list) pick our team?  A few things:
+
 * __There is not consensus on player value__ - There are lots of places to get player projects.  Certain players are really hard to project, like rookies.  In other cases, people may not feel that projections reflect injury risk.
 * __It does not take into account where we are in the draft__ - The descent curve between the best player and the replacement player isn't smooth; it has kinks and plateaus.  Plus, it doesn't often make sense to take whatever person is at the top of the VBD heap.  Do you really want to draft another QB before you have 3 starting WR?
 * __People aren't good at committing to a strategy__ - People get attached to specific players.  They jump the gun to draft players they like even if it isn't the logical choice.
 
 Actual draft behavior looks more like this:
+
 <div id="adp_plot" style="width: 885; height: 400;"></div>
+
 <script>
   Plotly.d3.csv("/data/fantasy_football/plot2.csv", function(data){
 
@@ -78,6 +82,7 @@ Actual draft behavior looks more like this:
     Plotly.newPlot('adp_plot', data, layout);
   });
 </script>
+
 Source: [NumberFire](http://www.numberfire.com/nfl/fantasy/fantasy-football-cheat-sheet/overall#)
 
 The peaks and troughs in the above graph represent opportunity!  We can derive value by anticipating what our opponents are going to do.  It makes more sense to have a strategy that adjusts dynamically based on where we are in the draft: what players we need, what players our opponents need, and what players are still remaining.  

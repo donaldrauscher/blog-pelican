@@ -1,10 +1,13 @@
 steps:
   - name: gcr.io/cloud-builders/git
-    args: ['clone', 'https://github.com/donaldrauscher/blog-pelican.git']
+    args: ['clone', '-b', '${_BRANCH}', '--single-branch', '--depth', '1', 'https://github.com/donaldrauscher/blog-pelican.git']
   - name: gcr.io/${PROJECT_ID}/pelican:latest
     args: ["content", "-v"]
     dir: blog-pelican
   - name: gcr.io/cloud-builders/gcloud
     entrypoint: gsutil
-    args: ["-m", "rsync", "-r", "-c", "-d", "./output", "gs://donaldrauscher.com"]
+    args: ["-m", "rsync", "-r", "-c", "-d", "./output", "gs://${_SUB_DOMAIN}.donaldrauscher.com"]
     dir: blog-pelican
+substitutions:
+  _BRANCH: master
+  _SUB_DOMAIN: www
