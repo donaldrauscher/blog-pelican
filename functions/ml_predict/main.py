@@ -6,6 +6,16 @@ def ml_predict(request):
     import googleapiclient.discovery
     import google.auth
 
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    }
+
+    # handle pre-flight options request
+    if request.method == 'OPTIONS':
+        return flask.make_response(('', 204, headers))
+
     _, project = google.auth.default()
 
     request_json = request.get_json()
@@ -25,7 +35,8 @@ def ml_predict(request):
     if 'error' in response:
         raise RuntimeError(response['error'])
 
-    response_obj = flask.make_response(json.dumps(response['predictions']))
-    response_obj.headers.add('Access-Control-Allow-Origin', '*')
-
-    return response_obj
+    return flask.make_response((
+        json.dumps(response['predictions']),
+        200,
+        headers
+    ))
