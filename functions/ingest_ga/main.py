@@ -5,6 +5,17 @@ def ingest_ga(request):
     import flask
     from google.cloud import bigquery
 
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET'
+    }
+
+    response = flask.make_response(('', 204, headers))
+
+    # handle pre-flight options request
+    if request.method == 'OPTIONS':
+        return response
+
     mapping = {
         'version': 'v',
         'tracking_id': 'tid',
@@ -30,8 +41,6 @@ def ingest_ga(request):
     if len(errors) > 0:
         raise RuntimeError(errors[0]['errors'])
 
-    resp = flask.make_response()
-    resp.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
-    return resp
 
