@@ -4,7 +4,7 @@ Tags: tensorflow, cloud-ml, nlp
 Slug: movie-reviews-tf
 Resources: jquery
 
-Recently, I've been having a lot of fun with Tensorflow!  Here I'm building a DNN classifier with TF for classifying movie reviews as positive or negative.  The data source is the [ACL 2011 IMDB dataset](http://ai.stanford.edu/~amaas/data/sentiment/).  I used a [custom estimator](https://www.tensorflow.org/guide/custom_estimators) so that I could implement cosine annealing for learning rate decay. 
+Recently, I've been having a lot of fun with Tensorflow!  Here I'm building a DNN bag-of-words classifier with TF for classifying movie reviews as positive or negative.  The data source is the [ACL 2011 IMDB dataset](http://ai.stanford.edu/~amaas/data/sentiment/).  I used a [custom estimator](https://www.tensorflow.org/guide/custom_estimators) so that I could implement cosine annealing for learning rate decay.
 
 I used [Cloud ML Engine](https://cloud.google.com/ml-engine/docs/tensorflow/deploying-models) to deploy the model on GCP.  I also used a Cloud Function to make the model accessible via a simple HTTP function.  Give it a try!
 
@@ -48,7 +48,8 @@ $(document).ready(function() {
 });
 </script>
 
-NOTE: I used a version of this dataset that had already been preprocessed into TFRecords.  As part of this preprocessing, the reviews were lowercases and split into words; punctuation, including "'", were treated as seperate words.  To properly serve this model, we need to replicate this preprocessing in the [serving input receiver](https://www.tensorflow.org/guide/saved_model#prepare_serving_inputs).  Unfortunately, I couldn't find a way to do this with native TF ops!  I was able to replicate it with `tf.py_func`.  However, [a documented limitation](https://www.tensorflow.org/api_docs/python/tf/py_func) of `py_func` is that it is *not* serialized in the GraphDef, so it cannot be used for serving, which requires serializing the model and restoring in a different environment.  Here, I'm only doing a simple word split by spaces.
+
+NOTE: I used a version of this dataset that had already been preprocessed into TFRecords.  As part of this preprocessing, the reviews were lowercases and split into words; punctuation, including "'", were treated as seperate words.  To properly serve this model, we need to replicate this preprocessing in the [serving input receiver](https://www.tensorflow.org/guide/saved_model#prepare_serving_inputs).  Unfortunately, I couldn't find a way to do this with native TF ops!  I was able to replicate it with `tf.py_func`.  However, [a documented limitation](https://www.tensorflow.org/api_docs/python/tf/py_func) of `py_func` is that it is *not* serialized in the GraphDef, so it cannot be used for serving, which requires serializing the model and restoring in a different environment.  Here, I'm only doing a simple word split by spaces.  I'm looking into building an input pipeline using [TF Transform](https://github.com/tensorflow/transform).
 
 
 Here's a [link](https://github.com/donaldrauscher/movie-reviews-tf) to all the code for the model build and a [link](https://github.com/donaldrauscher/blog-pelican/tree/master/functions/ml_predict) to the Cloud Function for serving. Cheers!
