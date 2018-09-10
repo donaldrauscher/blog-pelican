@@ -52,7 +52,7 @@ $(document).ready(function() {
 });
 </script>
 
-Here's a [link](https://github.com/donaldrauscher/movie-reviews-tf) to all the code for the model build and a [link](https://github.com/donaldrauscher/blog-pelican/tree/master/functions/ml_predict) to the Cloud Function for serving. Cheers!
+Here's a [link](https://github.com/donaldrauscher/movie-reviews-tf/tree/initial-post) to all the code for the model build and a [link](https://github.com/donaldrauscher/blog-pelican/tree/master/functions/ml_predict) to the Cloud Function for serving. Cheers!
 
 ===
 
