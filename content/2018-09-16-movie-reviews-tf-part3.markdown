@@ -4,7 +4,7 @@ Tags: tensorflow, cloud-ml-engine, cloud-functions
 Slug: movie-reviews-tf-part3
 Resources: jquery
 
-This is part 3 in a 3-part series ([part 1](./movie-reviews-tf-part2.html), [part 2](./movie-reviews-tf-part3.html)) on building and deploying a deep learning model for the popular [ACL 2011 IMDB dataset](http://ai.stanford.edu/~amaas/data/sentiment/).  In this part, I use [Cloud ML Engine](https://cloud.google.com/ml-engine/docs/tensorflow/deploying-models) to deploy the model on GCP.  I also use a Cloud Function to make the model accessible via a simple HTTP function.  Give it a try!
+This is part 3 in a 3-part series ([part 1](./movie-reviews-tf-part1.html), [part 2](./movie-reviews-tf-part2.html)) on building and deploying a deep learning model for the popular [ACL 2011 IMDB dataset](http://ai.stanford.edu/~amaas/data/sentiment/).  In this part, I host the model on [Cloud ML Engine](https://cloud.google.com/ml-engine/docs/tensorflow/deploying-models) and make it accessible via a simple HTTP Cloud Function.  Give it a try!
 
 
 <form id="movie_reviews">

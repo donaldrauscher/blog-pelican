@@ -3,7 +3,7 @@ Date: 2018-09-09
 Tags: tensorflow, nlp, glove, transfer-learning
 Slug: movie-reviews-tf-part2
 
-This is part 2 in a 3-part series ([part 1](./movie-reviews-tf-part1.html), [part 3](./movie-reviews-tf-part3.html)) on building and deploying a deep learning model for the popular [ACL 2011 IMDB dataset](http://ai.stanford.edu/~amaas/data/sentiment/).  In this part, I build a custom estimator in Tensorflow.
+This is part 2 in a 3-part series ([part 1](./movie-reviews-tf-part1.html), [part 3](./movie-reviews-tf-part3.html)) on building and deploying a deep learning model for the popular [ACL 2011 IMDB dataset](http://ai.stanford.edu/~amaas/data/sentiment/).  In this part, I build a [custom estimator](https://www.tensorflow.org/guide/custom_estimators) in Tensorflow.
 
 ===
 
